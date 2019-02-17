@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <!-- The CSS package above applies Google styling to buttons and other elements. -->
+
+    <style>
+        .branding-below {
+            bottom: 56px;
+            top: 0;
+        }
+        .branding-text {
+            left: 7px;
+            position: relative;
+            top: 3px;
+        }
+        .col-contain {
+            overflow: hidden;
+        }
+        .col-one {
+            float: left;
+            width: 50%;
+        }
+        .logo {
+            vertical-align: middle;
+        }
+        .radio-spacer {
+            height: 20px;
+        }
+        .width-100 {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar branding-below">
+    <form>
+        <div class="block col-contain">
+            <div class="col-one">
+            </div>
+            <div>
+            </div>
+        </div>
+        <? if (data.found ) { ?>
+        <div class="block form-group">
+            Страница: <a href="<?=data.page.url?>"><?=data.page.title?></a>
+        </div>
+        <div class="block form-group">
+            <label for="summary"><b>Описание изменений:</b></label>
+            <textarea class="width-100" id="summary" rows="10"></textarea>
+        </div>
+        <div class="block">
+            <input type="checkbox" id="is-minor">
+            <label for="is-minor">Малое изменение</label>
+        </div>
+        <div class="block" id="button-bar">
+            <button class="blue" id="publish">Записать страницу</button>
+        </div>
+        <? } else { ?>
+        <div class="block form-group">
+            Документ не связан с wiki старницей
+        </div>
+        <? } ?>
+
+    </form>
+</div>
+
+<div class="sidebar bottom">
+    <img alt="Add-on logo" class="logo" src="https://lh3.google.com/u/0/d/1JlThzoZNSbCtTLXXrO8dvEq44z_ffv9F=w1366-h608-iv1" width="27" height="27">
+    <span class="gray branding-text">Docs to Wiki</span>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    /**
+     * On document load, assign click handlers to each button and try to load the
+     * user's origin and destination language preferences if previously set.
+     */
+    $(function() {
+        $('#publish').click(publish);
+    });
+
+    function publish() {
+        this.disabled = true;
+        $('#error').remove();
+        var summary = $('#summary').val();
+        var isMinor = $('#is-minor').is(":checked")
+        google.script.run
+            .withSuccessHandler(
+                function(returnSuccess, element) {
+                    element.disabled = false;
+                })
+            .withFailureHandler(
+                function(msg, element) {
+                    showError('Не удалось отправить данные, пожалуйста, повторите попытку.', $('#publish'));
+                    element.disabled = false;
+                })
+            .withUserObject(this)
+            .doPublish(summary, isMinor);
+    }
+
+    function showError(msg, element) {
+        var div = $('<div id="error" class="error">' + msg + '</div>');
+        $(element).after(div);
+    }
+</script>
+</body>
+</html>

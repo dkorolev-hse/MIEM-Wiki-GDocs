@@ -1,0 +1,37 @@
+{
+  "name": "Docs2Wiki",
+  "version": "0.0.0",
+  "author": [
+    "wikiwork"
+  ],
+  "url": "https://www.mediawiki.org/wiki/Extension:Docs2Wiki",
+  "descriptionmsg": "myextension-desc",
+  "license-name": "MIT",
+  "type": "other",
+  "AutoloadClasses": {
+    "ApiGetByGoogleDocId": "api/ApiGetByGoogleDocId.php",
+    "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks": "Docs2WikiHooks.php",
+    "MediaWiki\\Extensions\\Docs2Wiki\\Database\\UpdaterHooks": "database/UpdaterHooks.php"
+  },
+  "AvailableRights": [
+    "myextension-right"
+  ],
+  "MessagesDirs": {},
+  "APIModules": {
+      "googledocsid": "ApiGetByGoogleDocId"
+  },
+  "manifest_version": 1,
+  "Hooks": {
+    "BeforePageDisplay": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onBeforePageDisplay",
+    "ArticleViewFooter": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onArticleViewFooter",
+    "PageContentSaveComplete": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onPageContentSaveComplete",
+    "LocalUserCreated": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onLocalUserCreated",
+    "LoadExtensionSchemaUpdates": "MediaWiki\\Extensions\\Docs2Wiki\\Database\\UpdaterHooks::addSchemaUpdates"
+  },
+  "config": {
+    "Docs2WikiApiUrl": {
+      "value": "",
+      "description": "Apps script API url"
+    }
+  }
+}

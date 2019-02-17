@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intercom.js/0.1.4/intercom.min.js"></script>
+</head>
+<body>
+<?if (ok) { ?>
+Авторизация прошла успешно.<br>
+Окно закроется автоматически.
+<? } else { ?>
+При авторизации произошла ошибка.<br>
+Закройте окно и попробуйте авторизоваться ещё раз.
+<? } ?>
+<script>
+    var intercom = Intercom.getInstance();
+    intercom.emit('oauthComplete', {
+        ok: <? if (ok) { ?>true<? } else {?>false<?}?>
+    });
+    if (window.top) {
+        window.top.close();
+    }
+</script>
+</body>
+</html>

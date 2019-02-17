@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <!-- The CSS package above applies Google styling to buttons and other elements. -->
+
+    <style>
+        .branding-below {
+            bottom: 56px;
+            top: 0;
+        }
+        .branding-text {
+            left: 7px;
+            position: relative;
+            top: 3px;
+        }
+        .col-contain {
+            overflow: hidden;
+        }
+        .col-one {
+            float: left;
+            width: 50%;
+        }
+        .logo {
+            vertical-align: middle;
+        }
+        .radio-spacer {
+            height: 20px;
+        }
+        .width-100 {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar branding-below">
+    <p>Wiki URL: <b>'<?= data.wiki_url ?></b></p>
+    <p>Wiki User: <b> <?= JWT.decode(data.wiki_jwt).username ?></b></p>
+    <button class="blue" id="publish">Публиковать</button>
+    <button id="logout">Выход</button>
+</div>
+
+<div class="sidebar bottom">
+    <img alt="Add-on logo" class="logo" src="https://lh3.google.com/u/0/d/1JlThzoZNSbCtTLXXrO8dvEq44z_ffv9F=w1366-h608-iv1" width="27" height="27">
+    <span class="gray branding-text">Google Docs to Wiki</span>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+
+    $(function() {
+        $('#publish').click(showPublish);
+        $('#logout').click(logout);
+    });
+
+    function showPublish() {
+        this.disabled = true;
+        google.script.run
+            .withUserObject(this)
+            .showSidebarPublish();
+    }
+    function logout() {
+        this.disabled = true;
+        google.script.run
+            .withUserObject(this)
+            .performLogout();
+    }
+</script>
+</body>
+</html>

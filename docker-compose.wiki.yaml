@@ -1,0 +1,37 @@
+# MediaWiki with MariaDB
+#
+# Access via "http://localhost:8080"
+#   (or "http://$(docker-machine ip):8080" if using docker-machine)
+
+# To Update after install extension
+# docker-compose -f docker-compose.wiki.yaml exec mediawiki php /var/www/html/maintenance/update.php
+
+version: '3'
+services:
+  mediawiki:
+    # image: mediawiki
+    build: .
+    restart: always
+    ports:
+      - 80:80
+    links:
+      - database
+    volumes:
+      - /var/www/html/images
+      - ./extensions/Docs2Wiki:/var/www/html/extensions/Docs2Wiki
+      # Uncomment this line to add LocalSettings.php after installation
+      # - ./LocalSettings.php:/var/www/html/LocalSettings.php
+  database:
+    image: mariadb
+    restart: always
+    environment:
+      # @see https://phabricator.wikimedia.org/source/mediawiki/browse/master/includes/DefaultSettings.php
+      MYSQL_DATABASE: my_wiki
+      MYSQL_USER: wikiuser
+      MYSQL_PASSWORD: example
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
