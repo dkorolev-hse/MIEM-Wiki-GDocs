@@ -6,6 +6,9 @@ use \MediaWiki\MediaWikiServices;
 
 class Docs2WikiHooks
 {
+    /*
+     * Returns Standalone app API URL defined in LocalSettings.php
+     */
     private static function getApiUrl () {
         global $wgDocs2WikiApiUrl;
         return $wgDocs2WikiApiUrl;
@@ -13,6 +16,9 @@ class Docs2WikiHooks
 
     static public function onBeforePageDisplay(&$out, &$skin) {}
 
+    /*
+     * Add link to Google Doc to the end of WikiPage
+     */
     public static function onArticleViewFooter( $article ) {
         $dbr = wfGetDB( DB_REPLICA );
         $google_docs_id = $dbr->selectField('page', 'google_docs_id', array('page_id' => $article->getPage()->getId()));
@@ -24,6 +30,9 @@ class Docs2WikiHooks
         }
     }
 
+    /*
+     * Send wikipage content to Standalone App API for save it into Google Docs
+     */
     public static function onPageContentSaveComplete( &$wikiPage, &$user, $content, $summary, $isMinor, $isWatch, $section, &$flags, $revision, &$status, $baseRevId, $undidRevId ) {
 
         $dbr = wfGetDB( DB_MASTER );
@@ -77,6 +86,9 @@ class Docs2WikiHooks
         }
     }
 
+    /*
+     * Converts HTML to Object representation
+     */
     private static function html_to_obj($html) {
 
         function element_to_obj($element) {
@@ -110,6 +122,10 @@ class Docs2WikiHooks
         return element_to_obj($dom->documentElement);
     }
 
+    /*
+     * Hook on New User creation
+     * Give permission to edit all existing Google Documents for new user
+     */
     public static function onLocalUserCreated( $user, $autocreated ) {
         $email = $user->mEmail;
         $emailParts = explode('@', $email);

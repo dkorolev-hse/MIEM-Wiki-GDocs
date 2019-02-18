@@ -12,6 +12,9 @@ function onOpen(e) {
     setupMenu();
 }
 
+/*
+* Add add-on menu
+*/
 function setupMenu() {
     DocumentApp.getUi()
         .createAddonMenu()
@@ -19,17 +22,23 @@ function setupMenu() {
         .addItem('Аккаунт wiki', 'showSidebarAccount')
         .addToUi();
 }
-
+/*
+* Wiki url
+*/
 function getWikiUrl () {
     return 'http://wikiwork.site';
 }
 
-
+/*
+* Triggered when add-on installed
+*/
 function onInstall(e) {
     onOpen(e);
 }
 
-
+/*
+* Returns OAuth service, fo send requests to mediawiki
+*/
 function getOAuthService() {
     var service = OAuth1.createService('wikiwork')
         .setAccessTokenUrl(getWikiUrl() + '/index.php?title=Special:OAuth/token')
@@ -46,6 +55,9 @@ function getOAuthService() {
     return service;
 }
 
+/*
+* OAuth callback
+*/
 function authCallback(request) {
     var service = getOAuthService();
     var authorized = service.handleCallback(request);
@@ -54,6 +66,9 @@ function authCallback(request) {
     return t.evaluate();
 }
 
+/*
+* Logout user from mediawiki
+*/
 function performLogout() {
     var service = getOAuthService();
     service.reset();
@@ -61,12 +76,17 @@ function performLogout() {
     showSidebarSignIn();
 }
 
+/*
+* Update add-on interface for Authenticated users
+*/
 function onLoginDone() {
     var service = getOAuthService();
     setupMenu();
     showSidebarAccount();
 }
-
+/*
+* Show sidebar for publishing document to mediawiki
+*/
 function showSidebarPublish() {
     var service = getOAuthService();
 
@@ -102,6 +122,9 @@ function showSidebarPublish() {
     }
 }
 
+/*
+* Show sidebar for Not Authenticated users
+*/
 function showSidebarSignIn(error) {
     var service = getOAuthService();
     service.reset();
@@ -116,6 +139,9 @@ function showSidebarSignIn(error) {
     DocumentApp.getUi().showSidebar(ui);
 }
 
+/*
+* Show sidebar for Authenticated users
+*/
 function showSidebarAccount() {
     var service = getOAuthService();
     if (service.hasAccess()) {
@@ -135,7 +161,9 @@ function showSidebarAccount() {
 function uiGetWikiUrl() {
     return getWikiUrl();
 }
-
+/*
+* Fetching Json Web Token with info about User from mediawiki
+*/
 function uiGetWikiJwt() {
     var service = getOAuthService();
     if (service.hasAccess()) {
@@ -144,7 +172,9 @@ function uiGetWikiJwt() {
         return response.getContentText();
     }
 }
-
+/*
+* Fetch edit (csrf) token from Mediawiki
+*/
 function fetchEditToken() {
     var service = getOAuthService();
     if (service.hasAccess()) {
@@ -156,12 +186,14 @@ function fetchEditToken() {
     }
 }
 
+/*
+* Publish content of google doc to mediawiki
+*/
 function doPublish(summary, isMinor) {
     var service = getOAuthService();
 
     if (service.hasAccess()) {
         var doc = DocumentApp.getActiveDocument();
-        // show user name and publishing interface
 
         var response = service.fetch(getWikiUrl() + '/api.php?format=json&action=googledocsid&google_docs_id=' + doc.getId());
         var obj = JSON.parse(response.getContentText());
@@ -187,6 +219,9 @@ function doPublish(summary, isMinor) {
     }
 }
 
+/*
+* Prepare wikitext of Google Document service item
+*/
 function makeWikitext(ctx, item) {
     var context = ctx;
     if (!context.list) {
@@ -256,6 +291,9 @@ function makeWikitext(ctx, item) {
     return res;
 }
 
+/*
+* Prepare wikitext content of Table
+*/
 function getTable(ctx, table) {
     var res = '';
     for (var rowsIndex = 0; rowsIndex < table.getNumChildren(); rowsIndex++) {
@@ -271,7 +309,9 @@ function getTable(ctx, table) {
     return '{| class="wikitable" ' + res + '\n|}';
 }
 
-
+/*
+* Get item's childrens wikitext
+*/
 function getChildrenText(ctx, item) {
     var res = '';
     var childCount = item.getNumChildren();
@@ -281,6 +321,9 @@ function getChildrenText(ctx, item) {
     return res;
 }
 
+/*
+* Prepare styled wikitext of an Google Document item
+*/
 function getFormatedText(ctx, item) {
     var text = item.getText();
     var partIndexes = item.getTextAttributeIndices();
@@ -354,6 +397,9 @@ function getFormatedText(ctx, item) {
     return res;
 }
 
+/*
+* Upload Google Docs InlineImage to MediaWiki
+*/
 function uploadImageToWIki(image) {
     var service = getOAuthService();
     var boundary = "9VakuZGPfV6AfhfyKG4XJaNaN";
@@ -396,6 +442,9 @@ function uploadImageToWIki(image) {
     return blob;
 }
 
+/*
+* Converts DocumentApp.GlyphType to mediawiki list type
+*/
 function getListType(glyph) {
     switch (glyph) {
         case DocumentApp.GlyphType.BULLET:

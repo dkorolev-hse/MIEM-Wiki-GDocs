@@ -1,3 +1,7 @@
+/*
+* API Post request handler
+* Handle requests of two resource types: page and user
+*/
 function doPost(e) {
     if(typeof e !== 'undefined' && e.postData.type === 'application/json' && !!e.postData.contents) {
         var params = JSON.stringify(e);
@@ -16,6 +20,9 @@ function doPost(e) {
     }
 }
 
+/*
+* Process requests of page resource
+*/
 function processResourcePage(requestBody) {
     var doc;
     var status = 'error';
@@ -37,6 +44,10 @@ function processResourcePage(requestBody) {
     return ContentService.createTextOutput(JSON.stringify({ status: status, fileId: doc.getId()}));
 }
 
+/*
+* Process requests of user resource
+* When user is created, add Editor to all provided Google Documents by Google Doc Id
+*/
 function processResourceUser(requestBody) {
     if (requestBody.action === 'create') {
         if (!requestBody.docs) {
@@ -50,13 +61,18 @@ function processResourceUser(requestBody) {
     return ContentService.createTextOutput(JSON.stringify({ status: status, fileId: doc.getId()}));
 }
 
+/*
+* Build document body from JSON representation of DOM, which is generated on Wikimedia side
+*/
 function buildDocFromContent(body, pageContent) {
 
+    // Context of current iteration
     var context = { attr: {} };
     context.attr[DocumentApp.Attribute.FONT_SIZE] = 11;
     context.attr[DocumentApp.Attribute.ITALIC] = false;
     context.attr[DocumentApp.Attribute.BOLD] = false;
 
+    // Headings mapping to Google Docs Headings
     var headings = {
         'h1': DocumentApp.ParagraphHeading.HEADING1,
         'h2': DocumentApp.ParagraphHeading.HEADING2,
@@ -66,6 +82,7 @@ function buildDocFromContent(body, pageContent) {
         'h6': DocumentApp.ParagraphHeading.HEADING6
     };
 
+    // Text style attributes mapping
     var text_attr = {
         'i': { key: DocumentApp.Attribute.ITALIC, value: true },
         'b': { key: DocumentApp.Attribute.BOLD, value: true },
@@ -77,17 +94,19 @@ function buildDocFromContent(body, pageContent) {
         'sup': DocumentApp.TextAlignment.SUPERSCRIPT,
         'sub': DocumentApp.TextAlignment.SUBSCRIPT
     };
-
+    // List style mapping
     var glyph_type = {
         'ul': 'BULLET',
         'ol': 'NUMBER'
     };
-
     var definition_indent = {
         'dt': 36,
         'dd': 40
     };
 
+    /*
+    * Add paragraph to Google Doc
+    */
     function addParagraph (context, elements, content) {
         var permitted = [
             DocumentApp.ElementType.BODY_SECTION,
@@ -112,6 +131,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Add text to Google Doc
     function addText (context, elements, content) {
         var permitted = [
             DocumentApp.ElementType.TABLE_CELL,
@@ -152,6 +172,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Add heading to google doc
     function addHeading (context, elements, content) {
         var PARENT = elements.PARENT;
         if (PARENT.getType() !== DocumentApp.ElementType.PARAGRAPH || PARENT.getText().length > 0) {
@@ -161,6 +182,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Prepare context to add ListItems
     function addListContainer (context, elements, content) {
         var permitted = [
             DocumentApp.ElementType.BODY_SECTION,
@@ -187,6 +209,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Add List item to Google Doc
     function addListItem (context, elements, content) {
 
         var permitted = [
@@ -208,7 +231,6 @@ function buildDocFromContent(body, pageContent) {
         }
         return PARENT;
     }
-
     function addDefinitionItem (context, elements, content) {
         if (text_attr[content.tag]) {
             context.attr[text_attr[content.tag].key] = text_attr[content.tag].value;
@@ -220,6 +242,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Add table to Google Doc
     function addTable (context, elements, content) {
         var permitted = [
             DocumentApp.ElementType.BODY_SECTION,
@@ -243,6 +266,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Add Table Row to Google Doc
     function addTableRow (context, elements, content) {
         var PARENT = elements.ROOT;
         if (elements.PARENT.getType() === DocumentApp.ElementType.TABLE) {
@@ -252,6 +276,7 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    // Add Table Cell to Google Doc
     function addTableCell (context, elements, content) {
         var PARENT = elements.ROOT;
         if (elements.PARENT.getType() === DocumentApp.ElementType.TABLE_ROW) {
@@ -274,6 +299,9 @@ function buildDocFromContent(body, pageContent) {
         return PARENT;
     }
 
+    /*
+    * Recursive function for walk through DOM and add elements to Google Doc
+    */
     function traversePageContent(ctx, elements, content) {
         var PARENT = elements.PARENT;
         var ROOT = elements.ROOT;
@@ -288,6 +316,7 @@ function buildDocFromContent(body, pageContent) {
             return traversePageContent(context, elements, content.children[0]);
         }
 
+        // Call functions for DOM elements
         switch (content.tag) {
             case 'div':
                 if (content.class === 'toc') return;
