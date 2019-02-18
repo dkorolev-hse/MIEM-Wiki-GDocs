@@ -28,9 +28,9 @@ Mediawiki extension and Google Apps Scripts (Addon + Standalone API) to edit wik
 1. Create project "Docs2Wiki Addon" on [GSuite Developer Hub](https://script.google.com/home);
 2. Copy files from GApps/addon to project (create files with same names as in repository and copy-paste content);
 3. Replace variables:
-   - Mediawiki site url (main.gs, line 24);
-   - ConsumerKey of mediawiki OAuth extension (main.gs, line 39);
-   - ConsumerSecret of mediawiki OAuth extension (main.gs, line 40).
+   - Mediawiki site url (main.gs, line 29);
+   - ConsumerKey of mediawiki OAuth extension (main.gs, line 48);
+   - ConsumerSecret of mediawiki OAuth extension (main.gs, line 49).
 4. Publish Addon to the Chrome Webstore. Follow [instructions](https://developers.google.com/gsuite/add-ons/how-tos/publish-addons).
    - **NOTE:** One time fee 5$ needed to confirm developer account;
    - **NOTE:** Select 'Unlisted' publishing option to use installation by link and don't wait while moderators aprove it;
