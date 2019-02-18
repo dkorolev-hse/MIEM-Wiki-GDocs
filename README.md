@@ -3,7 +3,7 @@
 Mediawiki extension and Google Apps Scripts (Addon + Standalone API) to edit wiki page content in Google doc and sync with mediawiki.
 
 ## Requirements
-* [Mediawiki](https://www.mediawiki.org/wiki/MediaWiki) (version 1.32.x) and [OAuth extension](https://www.mediawiki.org/wiki/Extension:OAuth) ([installation steps](docs/how-to-deploy-wikimedia.md));
+* [Mediawiki](https://www.mediawiki.org/wiki/MediaWiki) (version 1.32.x) and [OAuth extension](https://www.mediawiki.org/wiki/Extension:OAuth) ([installation steps](docs/how-to-deploy-mediawiki.md));
 * Chrome Webstore Developer account (one time 5$ fee to confirm developer account).
 
 ## Installation Steps

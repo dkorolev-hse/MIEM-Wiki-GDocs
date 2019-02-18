@@ -19,3 +19,8 @@ $ docker-compose -f docker-compose.wiki.yaml up -d
 ```sh
 $ docker-compose -f docker-compose.wiki.yaml up -d
 ```
+
+## Setup OAuth Consumer
+1. Fill and Submit form: http://your-host/index.php/Special:OAuthConsumerRegistration/propose
+2. Save "consumer token" and "secret token" (will beused by Addon);
+3. Activate OAuth Consumer, could be found in list (http://your-host/index.php//index.php/Special:OAuthListConsumers)
