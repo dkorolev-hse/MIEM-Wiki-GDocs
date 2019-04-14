@@ -24,24 +24,23 @@ function doPost(e) {
 * Process requests of page resource
 */
 function processResourcePage(requestBody) {
-    var doc;
-    var status = 'error';
-    if (requestBody.action === 'update' && !!requestBody.fileId) {
-        doc = DocumentApp.openById(requestBody.fileId);
-        status = 'updated';
-    }
-    if (requestBody.action === 'create' || !doc) {
-        doc = DocumentApp.create('Wiki Page: ' + requestBody.pageTitle);
-        doc.addEditors(requestBody.emails);
-        status = 'created';
-        var driveFile = DriveApp.getFileById(doc.getId());
-        driveFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.VIEW);
-    }
-
-    var body = doc.getBody();
-    body.setText('');
-    buildDocFromContent(body, requestBody.pageContent);
-    return ContentService.createTextOutput(JSON.stringify({ status: status, fileId: doc.getId()}));
+  var doc;
+  var status = 'error';
+  
+  if (requestBody.action === 'update' && !!requestBody.fileId) {
+    doc = DocumentApp.openById(requestBody.fileId);
+    status = 'updated';
+  }
+  if (requestBody.action === 'create' || !doc) {
+    doc = DocumentApp.create('Wiki Page: ' + requestBody.pageTitle);
+    status = 'created';
+    var driveFile = DriveApp.getFileById(doc.getId());
+    driveFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.VIEW);
+  }
+  var body = doc.getBody();
+  body.setText('');
+  buildDocFromContent(body, requestBody.pageContent)
+  return ContentService.createTextOutput(JSON.stringify({ status: status, fileId: doc.getId()}));
 }
 
 /*
@@ -49,16 +48,16 @@ function processResourcePage(requestBody) {
 * When user is created, add Editor to all provided Google Documents by Google Doc Id
 */
 function processResourceUser(requestBody) {
-    if (requestBody.action === 'create') {
-        if (!requestBody.docs) {
-            return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unable to proccess: "docs" field should be an array of fileId'}));
-        }
-        for (var i = 0; i < requestBody.docs.length; i++) {
-            var doc = DocumentApp.openById(requestBody.docs[i]);
-            doc.addEditor(requestBody.email);
-        }
-    }
-    return ContentService.createTextOutput(JSON.stringify({ status: status, fileId: doc.getId()}));
+  var status = 'error';
+  if (requestBody.action === 'add_document') {
+    if (!requestBody.docId) {
+      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unable to proccess: "docs" field should be an array of fileId'}));
+    } 
+    var doc = DocumentApp.openById(requestBody.docId);
+    doc.addEditor(requestBody.email);
+    status = 'success';
+  }
+  return ContentService.createTextOutput(JSON.stringify({ status: status, fileId: doc.getId()}));
 }
 
 /*

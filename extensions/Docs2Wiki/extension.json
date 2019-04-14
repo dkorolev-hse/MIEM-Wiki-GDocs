@@ -11,6 +11,7 @@
   "AutoloadClasses": {
     "ApiGetByGoogleDocId": "api/ApiGetByGoogleDocId.php",
     "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks": "Docs2WikiHooks.php",
+    "D2WSpecialRedirect2Docs": "D2WSpecialRedirect2Docs.php",
     "MediaWiki\\Extensions\\Docs2Wiki\\Database\\UpdaterHooks": "database/UpdaterHooks.php"
   },
   "AvailableRights": [
@@ -21,12 +22,15 @@
       "googledocsid": "ApiGetByGoogleDocId"
   },
   "manifest_version": 1,
+  "SpecialPages": {
+		"Docs2Wiki": "D2WSpecialRedirect2Docs"
+	},
   "Hooks": {
     "BeforePageDisplay": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onBeforePageDisplay",
     "ArticleViewFooter": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onArticleViewFooter",
     "PageContentSaveComplete": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onPageContentSaveComplete",
-    "LocalUserCreated": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onLocalUserCreated",
-    "LoadExtensionSchemaUpdates": "MediaWiki\\Extensions\\Docs2Wiki\\Database\\UpdaterHooks::addSchemaUpdates"
+    "LoadExtensionSchemaUpdates": "MediaWiki\\Extensions\\Docs2Wiki\\Database\\UpdaterHooks::addSchemaUpdates",
+    "AlternateEdit": "MediaWiki\\Extensions\\Docs2Wiki\\Docs2WikiHooks::onAlternateEdit"
   },
   "config": {
     "Docs2WikiApiUrl": {

@@ -3,6 +3,7 @@
 namespace MediaWiki\Extensions\Docs2Wiki;
 
 use \MediaWiki\MediaWikiServices;
+use \MediaWiki\EditPage;
 
 class Docs2WikiHooks
 {
@@ -44,22 +45,6 @@ class Docs2WikiHooks
         if (is_null($google_docs_id)) {
             // TODO: make post request to create new Google Document
             $data['action'] = 'create';
-
-            $rows = $dbr->select(
-                'user',
-                array( 'user_email' ),
-                "user_email <> ''"
-            );
-            $emails = [];
-            foreach( $rows as $row ) {
-                array_push($emails, $row->user_email);
-            }
-            $emails = array_unique($emails);
-            $data['emails'] = [];
-            foreach ( $emails as $k => $v) {
-                $data['emails'][] = $v;
-            }
-
         } else {
             // TODO: send wiki page content to google docs app script web handler
             $data['action'] = 'update';
@@ -122,36 +107,33 @@ class Docs2WikiHooks
         return element_to_obj($dom->documentElement);
     }
 
-    /*
-     * Hook on New User creation
-     * Give permission to edit all existing Google Documents for new user
-     */
-    public static function onLocalUserCreated( $user, $autocreated ) {
-        $email = $user->mEmail;
-        $emailParts = explode('@', $email);
-        if ($emailParts[count($emailParts) - 1] === 'gmail.com') {
-            $dbr = wfGetDB( DB_REPLICA );
-            $rows = $dbr->select(
-                'page',
-                array( 'google_docs_id' ),
-                'google_docs_id IS NOT NULL'
-            );
-            $docs = [];
-            foreach( $rows as $row ) {
-                array_push($docs, $row->google_docs_id);
-            }
-            $data = array( 'resource' => 'user', 'action' => 'create', 'email' => $email, 'docs' => $docs );
-
-            $options = array(
-                'http' => array(
-                    'header'  => "Content-type: application/json",
-                    'method'  => 'POST',
-                    'content' => json_encode($data)
-                ),
-            );
-            $context = stream_context_create( $options );
-            $result = file_get_contents( Docs2WikiHooks::getApiUrl(), false, $context );
+    public static function onAlternateEdit( $editpage ) {
+        global $wgUser;
+        
+        if ($wgUser->getId() === 0) {
+            $editpage->editFormPageTop = '<span style="color: red; opacity: 0.8;">Google docs: Please login to edit.</span><br><hr>';
+            return true;
         }
-        return true;
+        
+        $avaliable_domains = ['gmail.com', 'miem.hse.ru'];
+        $email = $wgUser->getEmail();
+        $emailParts = explode('@', $email);
+
+		if (!in_array($emailParts[count($emailParts) - 1], $avaliable_domains)) {
+            $editpage->editFormPageTop = '<span style="color: red; opacity: 0.8;">Google docs: User\' email domain is not supported</span><br><hr>';
+            return true;
+        } 
+
+        $dbr = wfGetDB( DB_REPLICA );
+        $wikiPage = $editpage->mArticle->getPage();
+        $google_docs_id = $dbr->selectField('page', 'google_docs_id', array('page_id' => $wikiPage->getId()));
+        
+        if (!is_null($google_docs_id) && !empty($google_docs_id)) {
+            $googleDocLink = 'index.php/Special:Docs2Wiki?doc_id='.$google_docs_id.'&email='.$email;
+            $editpage->editFormPageTop = '<a href="' . $googleDocLink . '">Edit in Google Doc</a><br><hr>';
+        } else {
+            $editpage->editFormPageTop = '<span style="color: red; opacity: 0.8;">Google docs: document is not created yet. Save page manually to create document on google drive.</span><br><hr>';
+        }
     }
+
 }
