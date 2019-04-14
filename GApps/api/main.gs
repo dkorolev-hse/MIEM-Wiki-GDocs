@@ -51,7 +51,7 @@ function processResourceUser(requestBody) {
   var status = 'error';
   if (requestBody.action === 'add_document') {
     if (!requestBody.docId) {
-      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unable to proccess: "docs" field should be an array of fileId'}));
+      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unable to proccess: "docId" required'}));
     } 
     var doc = DocumentApp.openById(requestBody.docId);
     doc.addEditor(requestBody.email);
